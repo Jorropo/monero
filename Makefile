@@ -39,7 +39,7 @@ debug: cmake-debug
 #  * libwallet_api_tests fail (Issue #895)
 debug-test:
 	mkdir -p build/debug
-	cd build/debug && cmake -D BUILD_TESTS=ON -D CMAKE_BUILD_TYPE=Debug ../.. &&  $(MAKE) && $(MAKE) ARGS="-E libwallet_api_tests" test
+	cd build/debug && cmake -D BUILD_TESTS=ON -D CMAKE_BUILD_TYPE=Debug ../.. && $(MAKE) && $(MAKE) ARGS="-E libwallet_api_tests" test
 
 debug-all:
 	mkdir -p build/debug
@@ -52,11 +52,11 @@ debug-static-all:
 debug-static-win64:
 	mkdir -p build/debug
 	cd build/debug && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Debug -D BUILD_TAG="win-x64" -D CMAKE_TOOLCHAIN_FILE=../../cmake/64-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys64 ../.. && $(MAKE)
- 
+
 debug-static-win32:
 	mkdir -p build/debug
 	cd build/debug && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="i686" -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=Debug -D BUILD_TAG="win-x32" -D CMAKE_TOOLCHAIN_FILE=../../cmake/32-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys32 ../.. && $(MAKE)
- 
+
 cmake-release:
 	mkdir -p build/release
 	cd build/release && cmake -D CMAKE_BUILD_TYPE=Release ../..
@@ -121,6 +121,38 @@ release-static-win64:
 release-static-win32:
 	mkdir -p build/release
 	cd build/release && cmake -G "MSYS Makefiles" -D STATIC=ON -D ARCH="i686" -D BUILD_64=OFF -D CMAKE_BUILD_TYPE=Release -D BUILD_TAG="win-x32" -D CMAKE_TOOLCHAIN_FILE=../../cmake/32-bit-toolchain.cmake -D MSYS2_FOLDER=c:/msys32 ../.. && $(MAKE)
+
+package-debian-amd64-monerod: release-static-linux-x86_64
+	mkdir -p build/packaging/amd64/monerod/DEBIAN
+	echo "Package: monerod" > build/packaging/amd64/monerod/DEBIAN/control
+	#echo Version: `cat src/version.cpp.in | grep "#define DEF_MONERO_VERSION \"" | cut -d'"' -f2`-`git rev-parse HEAD | cut -c1-8` >> build/packaging/amd64/monerod/DEBIAN/control #this echo takes actual branch from version.cpp.in
+	echo Version: `cat src/version.cpp.in | grep "#define DEF_MONERO_VERSION \"" | cut -d'"' -f2 | cut -d'-' -f1`-`git branch | grep "*" | cut -d' ' -f 2`-`git rev-parse HEAD | cut -c1-8` >> build/packaging/amd64/monerod/DEBIAN/control #this echo takes actual branch from git
+	cd build/packaging/amd64/monerod/DEBIAN/
+	echo "Section: Miscellaneous" >> control
+	echo "Priority: optional" >> control
+	echo "Architecture: amd64" >> control
+	echo "Depends: libssl-dev, pkg-config, libzmq3-dev, libsodium-dev, libminiupnpc-dev, libunwind8-dev, liblzma-dev, libreadline-dev, libldns-dev, libexpat1-dev" >> control
+	echo "Maintainer: Jorropo <jorropo.pgm@gmail.com>" >> control #The email maybe need to be changed by the monero fundation general email, but I don't find it, (me (Jorropo) can post on repo all produced .deb, if I do, stay like that and remove this comment)
+	echo "Description: Monero deamon" >> control
+	echo "Homepage: https://getmonero.org/" >> control
+	echo "Bugs: https://github.com/monero-project/monero/issues" >> control
+	cd ../
+	mkdir -p usr/bin
+	cp ../../release/bin/monerod usr/bin/
+	cd ../
+	dpkg-deb --build monerod
+
+package-debian-amd64-monero-wallet-cli: release-static-linux-x86_64
+	mkdir -p build/packaging/amd64/monero-wallet-cli/DEBIAN
+	mkdir -p build/packaging/amd64/monero-wallet-cli/usr/bin
+
+package-debian-amd64-monerod-wallet-rpc: release-static-linux-x86_64
+	mkdir -p build/packaging/amd64/monero-wallet-rpc/DEBIAN
+	mkdir -p build/packaging/amd64/monero-wallet-rpc/usr/bin
+
+package-debian-amd64-monero-blockchain-utils: release-static-linux-x86_64
+	mkdir -p build/packaging/amd64/monero-blockchain-utils/DEBIAN
+	mkdir -p build/packaging/amd64/monero-blockchain-utils/usr/bin
 
 fuzz:
 	mkdir -p build/fuzz

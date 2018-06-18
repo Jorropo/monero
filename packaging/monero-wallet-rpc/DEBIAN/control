@@ -1,0 +1,9 @@
+Package: monero-wallet-cli
+Version: 0.12.2.0-master-9226acca
+Section: Miscellaneous
+Priority: optional
+Architecture: amd64
+Depends: libboost-all-dev, libssl-dev, pkg-config, libzmq3-dev, libsodium-dev, libminiupnpc-dev, libunwind8-dev, liblzma-dev, libreadline-dev, libldns-dev, libexpat1-dev
+Maintainer: Jorropo <jorropo.pgm@gmail.com>
+Description: Monero wallet command line interface
+Homepage: https://getmonero.org/

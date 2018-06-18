@@ -104,3 +104,6 @@ local.properties
 .idea/
 
 /testnet
+
+# Debian packaging
+*.deb

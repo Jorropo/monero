@@ -1,0 +1,9 @@
+Package: monero
+Version: 0.12.2.0-master-9226acca
+Section: Miscellaneous
+Priority: optional
+Architecture: amd64
+Depends: monerod, monero-wallet
+Maintainer: Jorropo <jorropo.pgm@gmail.com>
+Description: Monero wallet and deamon
+Homepage: https://getmonero.org/
